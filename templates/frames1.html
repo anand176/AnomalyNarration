@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anomalous Frames</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .frame-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .frame-container div {
+            margin: 10px;
+            text-align: center;
+        }
+        .frame-container img {
+            max-width: 200px; /* Adjust the size as needed */
+            height: auto;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .frame-container button {
+            margin-top: 5px;
+            padding: 5px 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+    </style>
+    <script>
+        async function getFrameDescription(filename) {
+            const response = await fetch(`/describe_frame/${filename}`);
+            const data = await response.json();
+            alert(data.description);
+        }
+    </script>
+</head>
+<body>
+    <h1>Anomalous Frames</h1>
+    <div class="frame-container">
+        {% for frame in frames %}
+            <div>
+                <img src="{{ url_for('processed_frame', filename=frame) }}" alt="Anomalous Frame">
+                <button onclick="getFrameDescription('{{ frame }}')">Describe</button>
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

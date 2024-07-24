@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>AnomalyNarration - Video Result</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+      body {
+        background: #f8f9fa;
+      }
+      .container {
+        margin-top: 50px;
+      }
+      .card {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+      .card-header {
+        background: #007bff;
+        color: white;
+      }
+      .btn-primary {
+        background: #007bff;
+        border: none;
+      }
+      .btn-primary:hover {
+        background: #0056b3;
+      }
+      .alert-info {
+        margin-top: 20px;
+      }
+      .video-container {
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="card">
+        <div class="card-header text-center">
+          <h1>AnomalyNarration</h1>
+          <p>Processed Video</p>
+        </div>
+        <div class="card-body">
+          <div class="video-container">
+            <video width="800" controls>
+              <source src="{{ video_path }}" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  </body>
+</html>
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Processed Video</title>
+</head>
+<body>
+    <h1>Processed Video</h1>
+    <video width="640" height="480" controls>
+        <source src="{{ video_path }}" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+</body>
+</html> -->
+

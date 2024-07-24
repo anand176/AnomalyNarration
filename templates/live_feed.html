@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>AnomalyNarration - Live Stream</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+      body {
+        background: #f8f9fa;
+      }
+      .container {
+        margin-top: 50px;
+      }
+      .card {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+      .card-header {
+        background: #007bff;
+        color: white;
+      }
+      .btn-primary {
+        background: #007bff;
+        border: none;
+      }
+      .btn-primary:hover {
+        background: #0056b3;
+      }
+      .alert-info {
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="card">
+        <div class="card-header text-center">
+          <h1>AnomalyNarration</h1>
+          <p>Live Stream</p>
+        </div>
+        <div class="card-body text-center">
+          <div>
+            <img id="live-stream" src="{{ url_for('live_feed') }}" class="img-fluid" alt="Live Stream">
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  </body>
+</html>
