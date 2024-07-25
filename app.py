@@ -26,7 +26,7 @@ os.makedirs(app.config['PROCESSED_FRAMES_FOLDER'], exist_ok=True)
  
 # Load environment variables
 load_dotenv()
-genai.configure(api_key='AIzaSyCRU31GS3v7eiqXLPR4gAKRigbIB2i_L4E')
+genai.configure(api_key='api_key')
  
 # Register custom classes and initializers
 @tf.keras.utils.register_keras_serializable(package="Custom", name="Sequential")
