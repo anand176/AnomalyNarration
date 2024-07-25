@@ -7,3 +7,6 @@ matplotlib
 numpy
 pandas
 protobuf
+google-generativeai
+python-dotenv
+flask

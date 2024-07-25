@@ -12,38 +12,39 @@ from keras.initializers import Orthogonal
 import mediapipe as mp
 import google.generativeai as genai
 from dotenv import load_dotenv
-
+ 
 # Initialize Flask app
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['PROCESSED_FRAMES_FOLDER'] = 'processed_frames'
 app.config['ALLOWED_EXTENSIONS'] = {'mp4', 'avi', 'mov'}
-
+ 
 # Create folders if they don't exist
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 os.makedirs(app.config['PROCESSED_FRAMES_FOLDER'], exist_ok=True)
-
+ 
 # Load environment variables
 load_dotenv()
-genai.configure(api_key='apikey')
-
+genai.configure(api_key='AIzaSyCRU31GS3v7eiqXLPR4gAKRigbIB2i_L4E')
+ 
 # Register custom classes and initializers
 @tf.keras.utils.register_keras_serializable(package="Custom", name="Sequential")
 class CustomSequential(Sequential):
     pass
-
+ 
 @tf.keras.utils.register_keras_serializable(package="Custom", name="Orthogonal")
 class CustomOrthogonal(Orthogonal):
     pass
 
+ 
 # Load model
 custom_objects = {
     'Sequential': CustomSequential,
     'Orthogonal': CustomOrthogonal
 }
-
-with h5py.File("demo3.h5", 'r') as f:
+ 
+with h5py.File("demo1.h5", 'r') as f:
     model_config = f.attrs.get('model_config')
     model_config = json.loads(model_config)  
     for layer in model_config['config']['layers']:
@@ -58,32 +59,32 @@ with h5py.File("demo3.h5", 'r') as f:
             weight_names = weights_group[layer_name].attrs['weight_names']
             layer_weights = [weights_group[layer_name][weight_name] for weight_name in weight_names]
             layer.set_weights(layer_weights)
-
+ 
 # Function to check allowed file extensions
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
-
+ 
 # Function to clear the processed frames folder
 def clear_processed_frames_folder():
     for filename in os.listdir(app.config['PROCESSED_FRAMES_FOLDER']):
         file_path = os.path.join(app.config['PROCESSED_FRAMES_FOLDER'], filename)
         if os.path.isfile(file_path) or os.path.islink(file_path):
             os.unlink(file_path)
-
+ 
 # Function to process the video and detect anomalies
 def process_video(video_path, output_dir):
     # Clear the processed frames folder
     clear_processed_frames_folder()
-    
+   
     cap = cv2.VideoCapture(video_path)
     mpPose = mp.solutions.pose
     pose = mpPose.Pose()
     mpDraw = mp.solutions.drawing_utils
-
+ 
     lm_list = []
     label = "NotAnomaly"
     neutral_label = "Anomaly"
-
+ 
     def make_landmark_timestep(results):
         c_lm = []
         for lm in results.pose_landmarks.landmark:
@@ -92,7 +93,7 @@ def process_video(video_path, output_dir):
             c_lm.append(lm.z)
             c_lm.append(lm.visibility)
         return c_lm
-
+ 
     def draw_landmark_on_image(mpDraw, results, frame):
         mpDraw.draw_landmarks(frame, results.pose_landmarks, mpPose.POSE_CONNECTIONS)
         for lm in results.pose_landmarks.landmark:
@@ -100,7 +101,7 @@ def process_video(video_path, output_dir):
             cx, cy = int(lm.x * w), int(lm.y * h)
             cv2.circle(frame, (cx, cy), 3, (0, 255, 0), cv2.FILLED)
         return frame
-
+ 
     def draw_class_on_image(label, img):
         font = cv2.FONT_HERSHEY_SIMPLEX
         bottomLeftCornerOfText = (10, 30)
@@ -116,7 +117,7 @@ def process_video(video_path, output_dir):
                     thickness,
                     lineType)
         return img
-
+ 
     def detect(model, lm_list):
         nonlocal label
         lm_list = np.array(lm_list)
@@ -125,11 +126,11 @@ def process_video(video_path, output_dir):
         predicted_class = np.argmax(result[0])
         label = "Anomaly" if predicted_class == 0 else "NotAnomaly"
         return str(label)
-
+ 
     i = 0
     warm_up_frames = 60
     anomaly_count = 0
-
+ 
     while True:
         ret, frame = cap.read()
         if not ret:
@@ -167,10 +168,10 @@ def process_video(video_path, output_dir):
             frame = draw_class_on_image(label, frame)
         if cv2.waitKey(1) == ord('q'):
             break
-
+ 
     cap.release()
     cv2.destroyAllWindows()
-
+ 
 # Function to handle live video streaming with anomaly detection
 def generate_live_frames():
     cap = cv2.VideoCapture(0)  # 0 for default webcam
@@ -181,7 +182,7 @@ def generate_live_frames():
     label = "NotAnomaly"
     neutral_label = "Anomaly"
     anomaly_count = 0
-
+ 
     def make_landmark_timestep(results):
         c_lm = []
         for lm in results.pose_landmarks.landmark:
@@ -190,7 +191,7 @@ def generate_live_frames():
             c_lm.append(lm.z)
             c_lm.append(lm.visibility)
         return c_lm
-
+ 
     def draw_landmark_on_image(mpDraw, results, frame):
         mpDraw.draw_landmarks(frame, results.pose_landmarks, mpPose.POSE_CONNECTIONS)
         for lm in results.pose_landmarks.landmark:
@@ -198,7 +199,7 @@ def generate_live_frames():
             cx, cy = int(lm.x * w), int(lm.y * h)
             cv2.circle(frame, (cx, cy), 3, (0, 255, 0), cv2.FILLED)
         return frame
-
+ 
     def draw_class_on_image(label, img):
         font = cv2.FONT_HERSHEY_SIMPLEX
         bottomLeftCornerOfText = (10, 30)
@@ -214,7 +215,7 @@ def generate_live_frames():
                     thickness,
                     lineType)
         return img
-
+ 
     def detect(model, lm_list):
         nonlocal label
         lm_list = np.array(lm_list)
@@ -223,10 +224,10 @@ def generate_live_frames():
         predicted_class = np.argmax(result[0])
         label = "Anomaly" if predicted_class == 0 else "NotAnomaly"
         return str(label)
-
+ 
     i = 0
     warm_up_frames = 60
-
+ 
     while live_streaming:
         success, frame = cap.read()
         if not success:
@@ -256,7 +257,7 @@ def generate_live_frames():
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
     cap.release()
-
+ 
 # Route to upload video
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
@@ -276,45 +277,45 @@ def upload_file():
             process_video(video_path, output_dir)
             return redirect(url_for('show_anomalous_frames'))
     return render_template('upload1.html')
-
+ 
 # Route to handle live video streaming
 @app.route('/live_feed')
 def live_feed():
     global live_streaming
     live_streaming = True
     return Response(generate_live_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
-
+ 
 # Route to start live streaming
 @app.route('/start_live')
 def start_live():
     return redirect(url_for('live_feed'))
-
+ 
 # Route to stop live streaming
 @app.route('/stop_live')
 def stop_live():
     global live_streaming
     live_streaming = False
     return redirect(url_for('show_anomalous_frames'))
-
+ 
 # Route to serve processed frames
 @app.route('/processed_frames/<filename>')
 def processed_frame(filename):
     return send_from_directory(app.config['PROCESSED_FRAMES_FOLDER'], filename)
-
+ 
 # Route to display anomalous frames
 @app.route('/anomalous_frames')
 def show_anomalous_frames():
     frames = os.listdir(app.config['PROCESSED_FRAMES_FOLDER'])
     if not frames:
-        return render_template('frames21.html', frames=None)
-    return render_template('frames21.html', frames=frames)
-
+        return render_template('frames211.html', frames=None)
+    return render_template('frames211.html', frames=frames)
+ 
 # Route to show the image with a prompt form
 @app.route('/show_image/<filename>', methods=['GET'])
 def show_image(filename):
     return render_template('description1.html', filename=filename)
-
-
+ 
+ 
 # Route to process the prompt and show the response
 # @app.route('/process_prompt/<filename>', methods=['POST'])
 # def process_prompt(filename):
@@ -329,15 +330,14 @@ def show_image(filename):
 #         }
 #     ]
 #     response = get_gemini_response_vision(prompt, image_parts)
-
+ 
 #     # Store the prompt and response for later retrieval
 #     prompt_responses[filename] = {
 #         'prompt': prompt,
 #         'response': response
 #     }
 #     return redirect(url_for('show_prompt_response', filename=filename))
-
-@app.route('/process_prompt/<filename>', methods=['POST'])
+@app.route('/process_prompt/<filename>', methods=['POST', 'GET'])
 def process_prompt(filename):
     file_path = os.path.join(app.config['PROCESSED_FRAMES_FOLDER'], filename)
     with open(file_path, 'rb') as img_file:
@@ -348,28 +348,52 @@ def process_prompt(filename):
             "data": img_bytes
         }
     ]
-    response = get_gemini_response_vision('tell me whether the man is holding a phone. Reply in full sentence, do not mention anything else', image_parts)
+    response = get_gemini_response_vision('Tell me whether the man is holding a phone. Reply in full sentence, do not mention anything else', image_parts)
 
     # Store the prompt and response for later retrieval
     prompt_responses[filename] = {
-        'prompt': 'Describe this image',
+        'prompt': 'Tell me whether the man is holding a phone. Reply in full sentence, do not mention anything else',
         'response': response
     }
     return redirect(url_for('show_prompt_response', filename=filename))
 
-
-# Route to show the prompt and its response
-# @app.route('/prompt_response/<filename>')
-# def show_prompt_response(filename):
-#     prompt_response = prompt_responses.get(filename, {'prompt': 'N/A', 'response': 'N/A'})
-#     return render_template('prompt_response.html', filename=filename, prompt=prompt_response['prompt'], response=prompt_response['response'])
-
 @app.route('/prompt_response/<filename>')
 def show_prompt_response(filename):
-    prompt_response = prompt_responses.get(filename, {'prompt': 'tell me whether the man is holding a phone. Reply in full sentence, do not mention anything else', 'response': 'No response available'})
+    prompt_response = prompt_responses.get(filename, {'prompt': 'Tell me whether the man is holding a phone. Reply in full sentence, do not mention anything else', 'response': 'No response available'})
     return render_template('prompt_response1.html', filename=filename, prompt=prompt_response['prompt'], response=prompt_response['response'])
-
-
+# @app.route('/process_prompt/<filename>', methods=['POST'])
+# def process_prompt(filename):
+#     file_path = os.path.join(app.config['PROCESSED_FRAMES_FOLDER'], filename)
+#     with open(file_path, 'rb') as img_file:
+#         img_bytes = img_file.read()
+#     image_parts = [
+#         {
+#             "mime_type": "image/jpeg",
+#             "data": img_bytes
+#         }
+#     ]
+#     response = get_gemini_response_vision('tell me whether the man is holding a phone. Reply in full sentence, do not mention anything else', image_parts)
+ 
+#     # Store the prompt and response for later retrieval
+#     prompt_responses[filename] = {
+#         'prompt': 'Describe this image',
+#         'response': response,
+#     }
+#     return redirect(url_for('show_prompt_response', filename=filename))
+ 
+ 
+# # Route to show the prompt and its response
+# # @app.route('/prompt_response/<filename>')
+# # def show_prompt_response(filename):
+# #     prompt_response = prompt_responses.get(filename, {'prompt': 'N/A', 'response': 'N/A'})
+# #     return render_template('prompt_response.html', filename=filename, prompt=prompt_response['prompt'], response=prompt_response['response'])
+ 
+# @app.route('/prompt_response/<filename>')
+# def show_prompt_response(filename):
+#     prompt_response = prompt_responses.get(filename, {'prompt': 'tell me whether the man is holding a phone. Reply in full sentence, do not mention anything else', 'response': 'No response available'})
+#     return render_template('prompt_response1.html', filename=filename, prompt=prompt_response['prompt'], response=prompt_response['response'])
+ 
+ 
 # def get_gemini_response_vision(input_text, image_parts, prompt=None):
 #     model = genai.GenerativeModel('gemini-1.5-flash')
 #     if prompt:
@@ -381,16 +405,16 @@ def get_gemini_response_vision(input_text, image_parts):
     model = genai.GenerativeModel('gemini-1.5-flash')
     response = model.generate_content([input_text, image_parts[0]])
     return response.text
-
-
+ 
+ 
 # Dictionary to store prompt responses
 prompt_responses = {}
-
+ 
 # Route to render the live video feed page
 @app.route('/live')
 def live():
     return render_template('live_feed2.html')
-
+ 
 if __name__ == '__main__':
     live_streaming = False
     app.run(debug=True)

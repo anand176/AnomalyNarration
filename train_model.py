@@ -6,13 +6,13 @@ from keras.models import Sequential
 from sklearn.model_selection import train_test_split
 
 # Load the datasets
-anomaly1_df = pd.read_csv("Anomaly1.txt")
-anomaly2_df = pd.read_csv("Anomaly2.txt")
+anomaly1_df = pd.read_csv("Anomaly.txt")
+# anomaly2_df = pd.read_csv("Anomaly2.txt")
 # anomaly3_df = pd.read_csv("Anomaly3.txt")
 # anomaly4_df = pd.read_csv("Anomaly4.txt")
 
 # Combine the anomaly datasets
-anomaly_df = pd.concat([anomaly1_df, anomaly2_df])
+anomaly_df = pd.concat([anomaly1_df])
 
 # Prepare the data
 X = []
@@ -52,4 +52,4 @@ model.compile(optimizer="adam", metrics=["accuracy"], loss="binary_crossentropy"
 model.fit(X_train, y_train, epochs=50, batch_size=32, validation_data=(X_test, y_test))
 
 # Save the model
-model.save("demo3.h5")
+model.save("demo1.h5")
