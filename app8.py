@@ -20,7 +20,7 @@ os.makedirs(app.config['PROCESSED_FRAMES_FOLDER'], exist_ok=True)
 
 # Load environment variables
 load_dotenv()
-genai.configure(api_key=('AIzaSyCRU31GS3v7eiqXLPR4gAKRigbIB2i_L4E'))
+genai.configure(api_key=('api_key'))
 
 # Load autoencoder model
 model = tf.keras.models.load_model("autoencoder_video_complex.h5")
